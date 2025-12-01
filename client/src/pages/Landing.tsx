@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Flame, Target, Calendar, Bell, Check, Zap, ChevronDown, Star, Smartphone, BarChart3, Users, X, Shield, Clock, Brain, TrendingUp, MessageSquare, Github, Twitter, Linkedin, ExternalLink, Heart } from 'lucide-react';
 import { getGoogleAuthUrl, createCheckoutSession } from '../lib/api';
+import { Navbar } from '../components/Navbar';
 
 const testimonials = [
   {
@@ -134,6 +135,8 @@ export function Landing() {
 
   return (
     <div className="min-h-screen bg-dark-950 text-white">
+      <Navbar />
+
       {/* Exit Intent Popup */}
       {showExitPopup && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
@@ -154,11 +157,11 @@ export function Landing() {
       )}
 
       {/* HERO SECTION */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden" id="features">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 via-transparent to-orange-500/20" />
         <div className="absolute top-10 right-10 text-6xl animate-pulse hidden lg:block">🔥</div>
 
-        <div className="max-w-6xl mx-auto px-4 pt-12 pb-20">
+        <div className="max-w-6xl mx-auto px-4 pt-24 pb-20">
           {/* Live streak counter */}
           <div className="flex justify-center mb-8">
             <div className="bg-dark-800/80 backdrop-blur px-4 py-2 rounded-full flex items-center gap-2 text-sm border border-dark-700">
@@ -515,7 +518,7 @@ export function Landing() {
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-3 text-dark-400">
                 <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">API (Coming Soon)</a></li>
@@ -527,9 +530,9 @@ export function Landing() {
               <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-3 text-dark-400">
                 <li><a href="https://www.raghv.dev" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1">About the Creator <ExternalLink className="w-3 h-3" /></a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="mailto:hello@discipline.guru" className="hover:text-white transition-colors">Contact</a></li>
+                <li><Link to="/blog" className="hover:text-white transition-colors">Blog</Link></li>
+                <li><Link to="/careers" className="hover:text-white transition-colors">Careers</Link></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
               </ul>
             </div>
 
@@ -537,11 +540,22 @@ export function Landing() {
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-3 text-dark-400">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">GDPR</a></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">GDPR</Link></li>
               </ul>
+            </div>
+          </div>
+
+          {/* Canadian Badge */}
+          <div className="flex justify-center mb-8">
+            <div className="bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-500/30 rounded-xl px-6 py-4 flex items-center gap-4">
+              <span className="text-4xl">🍁</span>
+              <div>
+                <p className="font-bold text-lg">100% Canadian Company</p>
+                <p className="text-dark-400 text-sm">Proudly built and operated in Canada 🇨🇦</p>
+              </div>
             </div>
           </div>
 
@@ -558,7 +572,7 @@ export function Landing() {
                 </a>
               </p>
               <div className="flex items-center gap-4 text-dark-500 text-sm">
-                <span>🇮🇳 Built in India</span>
+                <span>🇨🇦 Made in Canada</span>
                 <span>•</span>
                 <span>🌍 Serving 180+ countries</span>
               </div>

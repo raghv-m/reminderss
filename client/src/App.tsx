@@ -10,6 +10,12 @@ import { Settings } from './pages/Settings';
 import { Login } from './pages/Login';
 import { AuthSuccess, AuthError } from './pages/AuthCallback';
 import { BillingSuccess, BillingCancel } from './pages/BillingCallback';
+import { Blog } from './pages/Blog';
+import { Careers } from './pages/Careers';
+import { Contact } from './pages/Contact';
+import { Privacy } from './pages/Privacy';
+import { Terms } from './pages/Terms';
+import { Cookies } from './pages/Cookies';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const userId = localStorage.getItem('userId');
@@ -31,6 +37,12 @@ function App() {
         <Route path="/auth/error" element={<AuthError />} />
         <Route path="/billing/success" element={<BillingSuccess />} />
         <Route path="/billing/cancel" element={<BillingCancel />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/cookies" element={<Cookies />} />
 
         {/* Protected routes */}
         <Route
