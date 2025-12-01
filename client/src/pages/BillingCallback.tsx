@@ -5,7 +5,8 @@ import { getSubscriptionStatus } from '../lib/api';
 
 export function BillingSuccess() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [_searchParams] = useSearchParams();
+  void _searchParams; // Used for URL state
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [plan, setPlan] = useState<string>('');
 

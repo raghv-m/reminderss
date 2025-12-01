@@ -56,8 +56,8 @@ const plans = [
 
 export function Landing() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const selectedPlan = searchParams.get('plan');
+  const [_searchParams] = useSearchParams();
+  void _searchParams; // Used for URL state
 
   const handleGetStarted = async (planId: string) => {
     const userId = localStorage.getItem('userId');

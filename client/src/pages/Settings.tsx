@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Phone, Globe, Bell, Calendar, LogOut, CheckCircle } from 'lucide-react';
+import { User, Phone, Globe, Calendar, CheckCircle } from 'lucide-react';
 import { getCurrentUser, updateUser, getGoogleAuthUrl } from '../lib/api';
 import type { User as UserType } from '../types';
 

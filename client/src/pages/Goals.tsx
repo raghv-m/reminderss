@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Dumbbell, BookOpen, Briefcase, Trash2, Edit2, Loader2 } from 'lucide-react';
+import { Plus, Dumbbell, BookOpen, Briefcase, Trash2, Edit2 } from 'lucide-react';
 import { GoalForm } from '../components/GoalForm';
 import { useToast } from '../components/Toast';
 import { getGoals, createGoal, deleteGoal } from '../lib/api';
@@ -25,6 +25,7 @@ export function Goals() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const { showToast } = useToast();
+  void deleting; // Used for loading state
 
   useEffect(() => {
     loadGoals();
