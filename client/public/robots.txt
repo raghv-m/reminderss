@@ -1,0 +1,12 @@
+# robots.txt for discipline.guru
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://discipline.guru/sitemap.xml
+
+# Disallow private pages
+Disallow: /auth/
+Disallow: /billing/
+Disallow: /api/
+

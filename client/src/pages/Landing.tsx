@@ -29,13 +29,13 @@ const testimonials = [
 ];
 
 const faqs = [
-  { q: "Will it spam me with notifications?", a: "Never. You get 1-3 smart reminders per day, fully customizable. Choose SMS, push, or email. Pause anytime." },
-  { q: "What if I have an unpredictable work schedule?", a: "That's exactly why we built shift upload! Take a screenshot of your work roster – our OCR reads it instantly and blocks those times before scheduling your goals." },
-  { q: "Do I need to plan everything myself?", a: "Nope. Just tell us your goals once (e.g., 'gym 5x/week', 'study 2 hours daily'). Our algorithm analyzes your calendar and builds the optimal schedule automatically." },
-  { q: "How is this different from a regular to-do app?", a: "To-do apps list tasks. We actively coach you. We send reminders, track completion with photo proof, build streaks, and escalate motivation when you slip. It's accountability, not just planning." },
-  { q: "Can I try before paying?", a: "Absolutely. Start free forever with 2 goals. No credit card needed. Upgrade to Pro only when you see results." },
-  { q: "What happens to my data?", a: "Your data is encrypted and stored securely on Supabase (enterprise-grade PostgreSQL). We never sell your data. You can export or delete everything anytime." },
-  { q: "Does it work internationally?", a: "Yes! We support all timezones, SMS works in 180+ countries via Twilio, and Google Calendar syncs globally." },
+  { q: "Will discipline.guru spam me with notifications?", a: "Never. Our habit tracker sends 1-3 smart daily reminders that you control. Choose between SMS, push notifications, or email. Pause anytime – your schedule app works with you, not against you." },
+  { q: "Can discipline.guru work with my unpredictable work schedule?", a: "Yes! discipline.guru is built for shift workers. Simply screenshot your work roster – our OCR technology reads it instantly and blocks those times before auto-scheduling your gym, study, or side hustle goals around your shifts." },
+  { q: "Do I need to manually plan my schedule every day?", a: "Not at all. Our schedule app uses an AI algorithm to build your perfect daily routine automatically. Tell us your goals once (e.g., 'gym 5x/week', 'study 2 hours daily'), connect Google Calendar, and we handle the rest." },
+  { q: "How is this different from a regular to-do app or habit tracker?", a: "Most to-do apps just list tasks. discipline.guru actively coaches you with smart reminders, tracks completion with optional photo proof, builds motivating streaks, and escalates accountability when you slip. It's a complete discipline system." },
+  { q: "Can I try the schedule app before paying?", a: "Absolutely! Start free forever with 2 goals and daily SMS reminders. No credit card required. Upgrade to Pro only when you see real results from our habit tracker." },
+  { q: "Is my data secure with Google Calendar sync?", a: "Your data is encrypted with 256-bit SSL and stored securely on Supabase (enterprise-grade PostgreSQL). We never sell your data. You can export or delete everything anytime. Google Calendar sync uses official OAuth2 – we only read/write calendar events." },
+  { q: "Does the habit tracker work internationally?", a: "Yes! discipline.guru supports all timezones. SMS reminders work in 180+ countries via Twilio, and Google Calendar syncs globally. Our schedule app serves users in Canada, USA, UK, Australia, and beyond." },
 ];
 
 const stats = [
@@ -157,13 +157,13 @@ export function Landing() {
       )}
 
       {/* HERO SECTION */}
-      <div className="relative overflow-hidden" id="features">
+      <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-500/20 via-transparent to-orange-500/20" />
-        <div className="absolute top-10 right-10 text-6xl animate-pulse hidden lg:block">🔥</div>
+        <div className="absolute top-20 right-20 text-6xl animate-pulse hidden lg:block opacity-60">🔥</div>
 
-        <div className="max-w-6xl mx-auto px-4 pt-24 pb-20">
+        <div className="max-w-6xl mx-auto px-4 pt-28 pb-20">
           {/* Live streak counter */}
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-6">
             <div className="bg-dark-800/80 backdrop-blur px-4 py-2 rounded-full flex items-center gap-2 text-sm border border-dark-700">
               <Flame className="w-4 h-4 text-orange-500" />
               <span>Current longest user streak: <strong className="text-orange-500">187 days</strong> 🔥</span>
@@ -171,20 +171,31 @@ export function Landing() {
           </div>
 
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
-              Never Miss a Workout, Study Session, or Goal Again
+            {/* SEO Optimized H1 */}
+            <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight bg-gradient-to-r from-white to-dark-200 bg-clip-text text-transparent">
+              Daily Schedule & Discipline App for Busy Professionals
             </h1>
-            <p className="text-xl md:text-2xl text-dark-300 mb-6 leading-relaxed">
-              discipline.guru sends you daily reminders, auto-builds your perfect schedule around your work shifts, syncs with Google Calendar, and tracks your fitness + learning progress – <strong className="text-white">all in one app.</strong>
+            <p className="text-xl md:text-2xl text-dark-300 mb-8 leading-relaxed max-w-3xl mx-auto">
+              The <strong className="text-primary-500">habit tracker</strong> that sends smart daily reminders, auto-builds your perfect <strong className="text-white">schedule around work shifts</strong>, syncs with <strong className="text-white">Google Calendar</strong>, and tracks your <strong className="text-white">fitness + study progress</strong>.
             </p>
+
+            {/* Quick Features List - Scannable */}
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              {['📱 SMS & Push Reminders', '📅 Google Calendar Sync', '⏰ Auto-Schedule Builder', '🔥 Streak Tracking', '💪 Gym & Study Planner'].map((f, i) => (
+                <span key={i} className="bg-dark-800/80 border border-dark-700 px-3 py-1.5 rounded-full text-sm text-dark-200">
+                  {f}
+                </span>
+              ))}
+            </div>
 
             <button
               onClick={() => handleGetStarted('free')}
-              className="bg-primary-500 hover:bg-primary-600 text-white text-xl font-bold py-5 px-10 rounded-xl shadow-2xl shadow-primary-500/30 transition-all hover:scale-105 mb-4"
+              className="bg-gradient-to-r from-primary-500 to-orange-500 hover:from-primary-600 hover:to-orange-600 text-white text-xl font-bold py-5 px-12 rounded-xl shadow-2xl shadow-primary-500/30 transition-all hover:scale-105 mb-4"
             >
-              Start My Free 7-Day Trial →
+              Start Free Trial →
             </button>
-            <p className="text-dark-400 text-sm">✓ No credit card required • ✓ Cancel anytime • ✓ First reminder tomorrow</p>
+            <p className="text-dark-400 text-sm mb-2">✓ No credit card required • ✓ Cancel anytime • ✓ First reminder tomorrow</p>
+            <p className="text-orange-500 text-sm font-semibold animate-pulse">⚡ First 500 users get 40% lifetime discount – 312 spots left</p>
 
             {/* Phone mockup */}
             <div className="mt-12 relative">
@@ -203,6 +214,26 @@ export function Landing() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* QUICK VALUE PROPS */}
+      <div className="bg-dark-900 py-8 border-y border-dark-800">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            {[
+              { icon: '⏱️', title: '2 min setup', desc: 'Connect calendar, set goals' },
+              { icon: '🧠', title: 'AI-powered', desc: 'Smart scheduling algorithm' },
+              { icon: '📱', title: 'SMS + Push', desc: 'Never miss a reminder' },
+              { icon: '🔒', title: 'Secure', desc: '256-bit SSL encrypted' },
+            ].map((item, i) => (
+              <div key={i} className="p-4">
+                <span className="text-2xl mb-2 block">{item.icon}</span>
+                <p className="font-bold text-sm">{item.title}</p>
+                <p className="text-dark-400 text-xs">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -274,11 +305,12 @@ export function Landing() {
       </div>
 
       {/* FEATURES */}
-      <div className="bg-dark-900 py-20">
+      <div className="bg-dark-900 py-20" id="features">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <p className="text-primary-500 font-semibold mb-2">POWERFUL FEATURES</p>
             <h2 className="text-3xl md:text-4xl font-bold">Everything You Need to Stay Disciplined</h2>
+            <p className="text-dark-400 mt-4 max-w-2xl mx-auto">Our habit tracker and schedule app combines smart automation with proven accountability techniques to help you stick to your gym, study, and work goals.</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -468,17 +500,22 @@ export function Landing() {
       <div className="py-24 bg-gradient-to-br from-primary-500/20 via-dark-950 to-orange-500/20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Ready to become the most disciplined version of yourself?
+            Ready to build unbreakable discipline?
           </h2>
           <p className="text-xl text-dark-300 mb-8 max-w-2xl mx-auto">
-            Stop relying on willpower alone. Let our system hold you accountable, build your schedule, and track your progress – automatically.
+            Stop relying on willpower alone. Let our habit tracker build your perfect schedule, send smart reminders, and track your gym & study progress – automatically.
           </p>
 
-          <button onClick={() => handleGetStarted('pro')} className="bg-white text-dark-900 text-xl font-bold py-5 px-12 rounded-xl shadow-2xl hover:scale-105 transition-all mb-6">
-            Start Free Now – First Reminder Tomorrow →
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+            <button onClick={() => handleGetStarted('pro')} className="bg-gradient-to-r from-primary-500 to-orange-500 hover:from-primary-600 hover:to-orange-600 text-white text-xl font-bold py-5 px-12 rounded-xl shadow-2xl hover:scale-105 transition-all">
+              Start Free Trial →
+            </button>
+            <Link to="/blog" className="text-dark-300 hover:text-white font-medium py-4 px-6 border border-dark-700 rounded-xl hover:border-dark-500 transition-colors">
+              Read How It Works →
+            </Link>
+          </div>
 
-          <div className="inline-flex items-center gap-2 bg-orange-500/20 text-orange-400 px-4 py-2 rounded-full mb-8">
+          <div className="inline-flex items-center gap-2 bg-orange-500/20 text-orange-400 px-4 py-2 rounded-full mb-6">
             <Flame className="w-5 h-5" />
             <span>First 500 users get lifetime 40% off – <strong>{spotsLeft} spots left</strong></span>
           </div>
