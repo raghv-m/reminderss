@@ -15,6 +15,9 @@ export interface User {
   phone: string;
   name: string;
   timezone: string;
+  province_state?: string;
+  country?: string;
+  default_hourly_rate?: number;
   created_at: string;
   google_refresh_token?: string;
 }
@@ -29,6 +32,7 @@ export interface Goal {
   preferred_times: string[]; // e.g., ['06:00-08:00', '20:00-22:00']
   priority: number;
   active: boolean;
+  relaxation_time_after?: number; // minutes of relaxation/travel time after this goal
   created_at: string;
 }
 

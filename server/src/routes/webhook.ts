@@ -4,9 +4,7 @@ import { supabase } from '../lib/supabase.js';
 
 const router = Router();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-04-30.basil',
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
@@ -71,7 +69,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const subscriptionId = session.subscription as string;
 
   // Get subscription details
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription;
+
+  const periodEnd = (subscription as any).current_period_end as number | undefined;
 
   await supabase
     .from('users')
@@ -79,7 +79,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       plan: planId,
       stripe_subscription_id: subscriptionId,
       subscription_status: 'active',
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      current_period_end: periodEnd 
+        ? new Date(periodEnd * 1000).toISOString()
+        : null,
     })
     .eq('id', userId);
 
@@ -105,11 +107,15 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     : subscription.status === 'past_due' ? 'past_due' 
     : 'inactive';
 
+  const periodEnd = (subscription as any).current_period_end as number | undefined;
+
   await supabase
     .from('users')
     .update({
       subscription_status: status,
-      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+      current_period_end: periodEnd
+        ? new Date(periodEnd * 1000).toISOString()
+        : null,
     })
     .eq('id', user.id);
 

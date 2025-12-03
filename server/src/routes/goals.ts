@@ -32,7 +32,7 @@ goalsRouter.get('/', async (req, res) => {
 // Create a new goal
 goalsRouter.post('/', async (req, res) => {
   const userId = req.headers['x-user-id'] as string;
-  const { type, name, weekly_target, daily_hours, preferred_times, priority } = req.body;
+  const { type, name, weekly_target, daily_hours, preferred_times, priority, relaxation_time_after } = req.body;
 
   if (!userId) {
     return res.status(401).json({ error: 'Not authenticated' });
@@ -49,6 +49,7 @@ goalsRouter.post('/', async (req, res) => {
         daily_hours,
         preferred_times: preferred_times || [],
         priority: priority || 1,
+        relaxation_time_after: relaxation_time_after ?? 15, // default 15 minutes
         active: true
       })
       .select()

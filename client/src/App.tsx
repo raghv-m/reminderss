@@ -6,6 +6,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Goals } from './pages/Goals';
 import { Schedule } from './pages/Schedule';
 import { Progress } from './pages/Progress';
+import { Payroll } from './pages/Payroll';
 import { Settings } from './pages/Settings';
 import { Login } from './pages/Login';
 import { AuthSuccess, AuthError } from './pages/AuthCallback';
@@ -74,6 +75,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Progress />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payroll"
+          element={
+            <ProtectedRoute>
+              <Payroll />
             </ProtectedRoute>
           }
         />

@@ -6,7 +6,8 @@ import {
   Calendar, 
   Settings, 
   Trophy,
-  Flame
+  Flame,
+  DollarSign
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -18,6 +19,7 @@ const navItems = [
   { path: '/goals', icon: Target, label: 'Goals' },
   { path: '/schedule', icon: Calendar, label: 'Schedule' },
   { path: '/progress', icon: Trophy, label: 'Progress' },
+  { path: '/payroll', icon: DollarSign, label: 'Payroll' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];
 

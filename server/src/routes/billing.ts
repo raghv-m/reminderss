@@ -4,9 +4,7 @@ import { supabase } from '../lib/supabase.js';
 
 const router = Router();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-04-30.basil',
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 // Price IDs - replace with your actual Stripe price IDs
 const PRICE_IDS: Record<string, string> = {

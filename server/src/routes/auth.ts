@@ -82,21 +82,27 @@ authRouter.get('/me', async (req, res) => {
 // Update user profile
 authRouter.patch('/me', async (req, res) => {
   const userId = req.headers['x-user-id'] as string;
-  const { phone, timezone, name } = req.body;
+  const { phone, timezone, name, provinceState, country, defaultHourlyRate } = req.body;
 
   if (!userId) {
     return res.status(401).json({ error: 'Not authenticated' });
   }
 
   try {
+    const updates: any = {
+      phone,
+      timezone,
+      name,
+      updated_at: new Date().toISOString()
+    };
+
+    if (provinceState !== undefined) updates.province_state = provinceState;
+    if (country !== undefined) updates.country = country;
+    if (defaultHourlyRate !== undefined) updates.default_hourly_rate = defaultHourlyRate;
+
     const { data: user, error } = await supabase
       .from('users')
-      .update({
-        phone,
-        timezone,
-        name,
-        updated_at: new Date().toISOString()
-      })
+      .update(updates)
       .eq('id', userId)
       .select()
       .single();
@@ -109,5 +115,14 @@ authRouter.patch('/me', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+// Logout (clear session on server side if needed)
+authRouter.post('/logout', async (req, res) => {
+  const userId = req.headers['x-user-id'] as string;
+  
+  // Optionally invalidate tokens or clear server-side session
+  // For now, just acknowledge logout
+  res.json({ success: true, message: 'Logged out successfully' });
 });
 

@@ -12,10 +12,13 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.86.0",
     "@vercel/analytics": "^1.5.0",
+    "canvas-confetti": "^1.9.4",
+    "framer-motion": "^12.23.25",
     "lucide-react": "^0.555.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.9.6"
+    "react-router-dom": "^7.9.6",
+    "tesseract.js": "^6.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",

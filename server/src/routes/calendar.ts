@@ -43,10 +43,20 @@ calendarRouter.post('/generate', async (req, res) => {
 
   try {
     const events = await scheduleDay(userId, new Date());
-    res.json({ success: true, events });
-  } catch (error) {
+    res.json({ 
+      success: true, 
+      events,
+      message: events.length > 0 
+        ? `Generated ${events.length} scheduled events! They've been synced to your Google Calendar.`
+        : 'No events scheduled. Make sure you have active goals and available time slots.'
+    });
+  } catch (error: any) {
     console.error('Schedule generation error:', error);
-    res.status(500).json({ error: 'Failed to generate schedule' });
+    res.status(500).json({ 
+      success: false,
+      error: error.message || 'Failed to generate schedule',
+      events: []
+    });
   }
 });
 

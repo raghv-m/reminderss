@@ -12,6 +12,16 @@ export function clearUserId(): void {
   localStorage.removeItem('userId');
 }
 
+export async function logout() {
+  clearUserId();
+  // Optionally call backend to invalidate session
+  try {
+    await fetchAPI('/api/auth/logout', { method: 'POST' });
+  } catch (error) {
+    // Ignore errors on logout
+  }
+}
+
 async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const userId = getUserId();
   
@@ -41,7 +51,14 @@ export async function getCurrentUser() {
   return fetchAPI('/api/auth/me');
 }
 
-export async function updateUser(data: { phone?: string; timezone?: string; name?: string }) {
+export async function updateUser(data: { 
+  phone?: string; 
+  timezone?: string; 
+  name?: string;
+  provinceState?: string;
+  country?: string;
+  defaultHourlyRate?: number;
+}) {
   return fetchAPI('/api/auth/me', {
     method: 'PATCH',
     body: JSON.stringify(data),
@@ -60,6 +77,7 @@ export async function createGoal(data: {
   daily_hours?: number;
   preferred_times?: string[];
   priority?: number;
+  relaxation_time_after?: number;
 }) {
   return fetchAPI('/api/goals', {
     method: 'POST',
@@ -171,10 +189,23 @@ export async function getShifts() {
   return fetchAPI('/api/shifts');
 }
 
-export async function addShift(date: string, startTime: string, endTime: string) {
+export async function addShift(date: string, startTime: string, endTime: string, location?: string, title?: string) {
   return fetchAPI('/api/shifts', {
     method: 'POST',
-    body: JSON.stringify({ date, startTime, endTime }),
+    body: JSON.stringify({ date, startTime, endTime, location, title }),
+  });
+}
+
+export async function addShiftsBatch(shifts: Array<{
+  date: string;
+  startTime: string;
+  endTime: string;
+  location?: string;
+  title?: string;
+}>) {
+  return fetchAPI('/api/shifts/batch', {
+    method: 'POST',
+    body: JSON.stringify({ shifts }),
   });
 }
 
@@ -182,5 +213,55 @@ export async function deleteShift(shiftId: string) {
   return fetchAPI(`/api/shifts/${shiftId}`, {
     method: 'DELETE',
   });
+}
+
+export async function syncShiftsToCalendar() {
+  return fetchAPI('/api/shifts/sync-calendar', {
+    method: 'POST',
+  });
+}
+
+// Payroll
+export async function getPayrollSummary(periodType: 'weekly' | 'biweekly' | 'monthly' = 'monthly', startDate?: string, endDate?: string) {
+  const params = new URLSearchParams({ periodType });
+  if (startDate) params.append('startDate', startDate);
+  if (endDate) params.append('endDate', endDate);
+  return fetchAPI(`/api/payroll/summary?${params}`);
+}
+
+export async function calculateShiftPayroll(shiftId: string, hourlyRate: number) {
+  return fetchAPI(`/api/payroll/shifts/${shiftId}/calculate`, {
+    method: 'POST',
+    body: JSON.stringify({ hourlyRate }),
+  });
+}
+
+export async function getWorkingHours(days = 30) {
+  return fetchAPI(`/api/payroll/hours?days=${days}`);
+}
+
+export async function updatePayrollSettings(data: { hourlyRate?: number; provinceState?: string; country?: string }) {
+  return fetchAPI('/api/payroll/settings', {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+// Accomplishments
+export async function trackAccomplishment(data: {
+  goalId: string;
+  date: string;
+  hoursCompleted?: number;
+  completed?: boolean;
+  notes?: string;
+}) {
+  return fetchAPI('/api/accomplishments', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getAccomplishmentsSummary(days = 30) {
+  return fetchAPI(`/api/accomplishments/summary?days=${days}`);
 }
 

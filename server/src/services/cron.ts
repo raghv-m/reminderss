@@ -40,15 +40,24 @@ async function sendMorningCheckIns() {
       .select('*')
       .not('phone', 'is', null);
 
-    if (!users) return;
+    if (!users || users.length === 0) {
+      console.log('📱 No users with phone numbers found for morning check-ins');
+      return;
+    }
 
+    let sentCount = 0;
     for (const user of users) {
       if (user.phone) {
-        await sendMorningCheckIn(user.phone, user.name || 'Champion');
+        try {
+          await sendMorningCheckIn(user.phone, user.name || 'Champion');
+          sentCount++;
+        } catch (error) {
+          console.error(`Failed to send check-in to ${user.phone}:`, error);
+        }
       }
     }
 
-    console.log(`📱 Sent ${users.length} morning check-ins`);
+    console.log(`📱 Sent ${sentCount}/${users.length} morning check-ins`);
   } catch (error) {
     console.error('Error sending morning check-ins:', error);
   }

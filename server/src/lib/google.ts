@@ -79,24 +79,35 @@ export async function createCalendarEvent(
     description?: string;
     startTime: Date;
     endTime: Date;
+    location?: string;
     reminders?: number[];
+    colorId?: string;
   }
 ): Promise<string | null> {
   const calendar = createCalendarClient(refreshToken);
 
+  // Use America/Edmonton for Canadian timezone (adjust as needed)
+  const timeZone = 'America/Edmonton';
+
   try {
+    console.log(`📅 Creating calendar event: ${event.title}`);
+    console.log(`   Start: ${event.startTime.toISOString()}`);
+    console.log(`   End: ${event.endTime.toISOString()}`);
+    console.log(`   Location: ${event.location || 'None'}`);
+    
     const response = await calendar.events.insert({
       calendarId: 'primary',
       requestBody: {
         summary: event.title,
         description: event.description || 'Scheduled by DisciplineOS',
+        location: event.location || undefined,
         start: {
           dateTime: event.startTime.toISOString(),
-          timeZone: 'America/Los_Angeles'
+          timeZone
         },
         end: {
           dateTime: event.endTime.toISOString(),
-          timeZone: 'America/Los_Angeles'
+          timeZone
         },
         reminders: {
           useDefault: false,
@@ -105,13 +116,24 @@ export async function createCalendarEvent(
             minutes: mins
           }))
         },
-        colorId: '11' // Red for discipline events
+        colorId: event.colorId || '11' // Default red for discipline events
       }
     });
 
-    return response.data.id || null;
-  } catch (error) {
-    console.error('Error creating calendar event:', error);
+    const eventId = response.data.id || null;
+    if (eventId) {
+      console.log(`✅ Created calendar event with ID: ${eventId}`);
+    } else {
+      console.warn(`⚠️ Calendar event created but no ID returned`);
+    }
+    return eventId;
+  } catch (error: any) {
+    console.error('❌ Error creating calendar event:', error);
+    console.error('   Error details:', error.message);
+    if (error.response) {
+      console.error('   Response status:', error.response.status);
+      console.error('   Response data:', error.response.data);
+    }
     return null;
   }
 }

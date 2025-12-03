@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS goals (
   preferred_times TEXT[] DEFAULT '{}',
   priority INTEGER DEFAULT 1,
   active BOOLEAN DEFAULT true,
+  relaxation_time_after INTEGER DEFAULT 15, -- minutes of relaxation/travel time after this goal
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

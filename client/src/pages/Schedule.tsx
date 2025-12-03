@@ -1,16 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Calendar, RefreshCw, ChevronLeft, ChevronRight, Upload, Briefcase, Trash2, Plus, Loader2 } from 'lucide-react';
+import { Calendar, RefreshCw, ChevronLeft, ChevronRight, Upload, Briefcase, Trash2, Plus, Loader2, CloudUpload, MapPin, Clock, Check } from 'lucide-react';
 import { ScheduleCard } from '../components/ScheduleCard';
-import { getTodaySchedule, generateSchedule, completeEvent, uploadScheduleImage, getShifts, addShift, deleteShift } from '../lib/api';
+import { getTodaySchedule, generateSchedule, completeEvent, uploadScheduleImage, getShifts, addShift, deleteShift, syncShiftsToCalendar } from '../lib/api';
 import { useToast } from '../components/Toast';
-import type { ScheduledEvent } from '../types';
-
-interface Shift {
-  id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-}
+import type { ScheduledEvent, Shift } from '../types';
 
 export function Schedule() {
   const [schedule, setSchedule] = useState<ScheduledEvent[]>([]);
@@ -18,9 +11,10 @@ export function Schedule() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showAddShift, setShowAddShift] = useState(false);
-  const [newShift, setNewShift] = useState({ date: '', startTime: '', endTime: '' });
+  const [newShift, setNewShift] = useState({ date: '', startTime: '', endTime: '', location: '' });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
 
@@ -56,9 +50,25 @@ export function Schedule() {
 
     setUploading(true);
     try {
-      const result = await uploadScheduleImage(file) as { shifts: Shift[], parsed: number };
-      showToast(`✅ Parsed ${result.parsed} shifts from your schedule!`, 'success');
+      const result = await uploadScheduleImage(file) as { 
+        shifts: Shift[], 
+        parsed: number, 
+        synced?: number,
+        message?: string,
+        calendarErrors?: any[]
+      };
+      
+      let message = `✅ Parsed ${result.parsed} shifts from your schedule!`;
+      if (result.synced !== undefined) {
+        message += ` ${result.synced} synced to Google Calendar with driving time.`;
+      }
+      if (result.message) {
+        message = result.message;
+      }
+      
+      showToast(message, 'success');
       loadShifts();
+      loadSchedule(); // Reload schedule in case shifts were added
     } catch (error: any) {
       showToast(error.message || 'Failed to parse schedule', 'error');
     } finally {
@@ -73,13 +83,30 @@ export function Schedule() {
       return;
     }
     try {
-      await addShift(newShift.date, newShift.startTime + ':00', newShift.endTime + ':00');
+      await addShift(newShift.date, newShift.startTime + ':00', newShift.endTime + ':00', newShift.location);
       showToast('Shift added!', 'success');
       setShowAddShift(false);
-      setNewShift({ date: '', startTime: '', endTime: '' });
+      setNewShift({ date: '', startTime: '', endTime: '', location: '' });
       loadShifts();
     } catch (error) {
       showToast('Failed to add shift', 'error');
+    }
+  };
+
+  const handleSyncToCalendar = async () => {
+    setSyncing(true);
+    try {
+      const result = await syncShiftsToCalendar() as any;
+      if (result.synced > 0) {
+        showToast(`✅ Synced ${result.synced} shifts to Google Calendar with driving time! ❄️`, 'success');
+      } else {
+        showToast('No new shifts to sync', 'success');
+      }
+      loadShifts();
+    } catch (error: any) {
+      showToast(error.message || 'Failed to sync to calendar', 'error');
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -96,10 +123,20 @@ export function Schedule() {
   const handleGenerate = async () => {
     setGenerating(true);
     try {
-      const { events } = await generateSchedule() as { events: ScheduledEvent[] };
-      setSchedule(events);
-    } catch (error) {
+      const result = await generateSchedule() as { success?: boolean; events?: ScheduledEvent[]; error?: string };
+      if (result.success && result.events) {
+        setSchedule(result.events);
+        showToast(`✅ Generated ${result.events.length} scheduled events!`, 'success');
+        loadSchedule(); // Reload to get fresh data
+      } else if (result.error) {
+        showToast(result.error, 'error');
+      } else {
+        showToast('Schedule generated successfully!', 'success');
+        loadSchedule(); // Reload to get fresh data
+      }
+    } catch (error: any) {
       console.error('Failed to generate schedule:', error);
+      showToast(error.message || 'Failed to generate schedule', 'error');
     } finally {
       setGenerating(false);
     }
@@ -143,9 +180,9 @@ export function Schedule() {
         </div>
         <button
           onClick={handleGenerate}
-          disabled={generating || shifts.length === 0}
-          className="btn-primary flex items-center gap-2"
-          title={shifts.length === 0 ? 'Add work shifts first!' : ''}
+          disabled={generating}
+          className="btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          title={shifts.length === 0 ? 'Will generate schedule for your goals. Add work shifts to schedule around them.' : 'Generate optimized schedule'}
         >
           <RefreshCw className={`w-5 h-5 ${generating ? 'animate-spin' : ''}`} />
           {generating ? 'Generating...' : 'Generate Schedule'}
@@ -154,31 +191,27 @@ export function Schedule() {
 
       {/* Work Shifts Section */}
       <div className="card border-2 border-dashed border-dark-700">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
             <Briefcase className="w-6 h-6 text-orange-500" />
             <h2 className="text-xl font-bold">Your Work Shifts</h2>
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowAddShift(!showAddShift)}
-              className="btn-secondary flex items-center gap-2 text-sm"
-            >
+          <div className="flex flex-wrap gap-2">
+            <button onClick={() => setShowAddShift(!showAddShift)} className="btn-secondary flex items-center gap-2 text-sm">
               <Plus className="w-4 h-4" />
               Add Manually
             </button>
-            <label className="btn-primary flex items-center gap-2 text-sm cursor-pointer">
+            <label className="btn-secondary flex items-center gap-2 text-sm cursor-pointer">
               {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
               {uploading ? 'Processing...' : 'Upload Screenshot'}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleUpload}
-                disabled={uploading}
-              />
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} disabled={uploading} />
             </label>
+            {shifts.filter(s => !s.synced_to_calendar).length > 0 && (
+              <button onClick={handleSyncToCalendar} disabled={syncing} className="btn-primary flex items-center gap-2 text-sm">
+                {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CloudUpload className="w-4 h-4" />}
+                {syncing ? 'Syncing...' : `Sync ${shifts.filter(s => !s.synced_to_calendar).length} to Calendar`}
+              </button>
+            )}
           </div>
         </div>
 
@@ -187,30 +220,19 @@ export function Schedule() {
           <div className="bg-dark-800 p-4 rounded-lg mb-4 flex flex-wrap gap-4 items-end">
             <div>
               <label className="block text-sm text-dark-400 mb-1">Date</label>
-              <input
-                type="date"
-                value={newShift.date}
-                onChange={e => setNewShift({ ...newShift, date: e.target.value })}
-                className="input"
-              />
+              <input type="date" value={newShift.date} onChange={e => setNewShift({ ...newShift, date: e.target.value })} className="input" />
             </div>
             <div>
               <label className="block text-sm text-dark-400 mb-1">Start</label>
-              <input
-                type="time"
-                value={newShift.startTime}
-                onChange={e => setNewShift({ ...newShift, startTime: e.target.value })}
-                className="input"
-              />
+              <input type="time" value={newShift.startTime} onChange={e => setNewShift({ ...newShift, startTime: e.target.value })} className="input" />
             </div>
             <div>
               <label className="block text-sm text-dark-400 mb-1">End</label>
-              <input
-                type="time"
-                value={newShift.endTime}
-                onChange={e => setNewShift({ ...newShift, endTime: e.target.value })}
-                className="input"
-              />
+              <input type="time" value={newShift.endTime} onChange={e => setNewShift({ ...newShift, endTime: e.target.value })} className="input" />
+            </div>
+            <div>
+              <label className="block text-sm text-dark-400 mb-1">Location</label>
+              <input type="text" value={newShift.location} onChange={e => setNewShift({ ...newShift, location: e.target.value })} className="input" placeholder="e.g., Downtown" />
             </div>
             <button onClick={handleAddShift} className="btn-primary">Add</button>
           </div>
@@ -220,12 +242,22 @@ export function Schedule() {
         {shifts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {shifts.map(shift => (
-              <div key={shift.id} className="bg-dark-800 p-3 rounded-lg flex justify-between items-center">
-                <div>
-                  <p className="font-medium">{new Date(shift.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-                  <p className="text-dark-400 text-sm">
-                    {shift.start_time.slice(0, 5)} - {shift.end_time.slice(0, 5)}
+              <div key={shift.id} className={`bg-dark-800 p-3 rounded-lg flex justify-between items-start ${shift.synced_to_calendar ? 'border-l-4 border-green-500' : ''}`}>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{new Date(shift.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                    {shift.synced_to_calendar && <Check className="w-4 h-4 text-green-500" />}
+                  </div>
+                  <p className="text-dark-400 text-sm flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {shift.start_time?.slice(0, 5)} - {shift.end_time?.slice(0, 5)}
                   </p>
+                  {shift.location && (
+                    <p className="text-dark-500 text-xs flex items-center gap-1 mt-1">
+                      <MapPin className="w-3 h-3" />
+                      {shift.location}
+                    </p>
+                  )}
                 </div>
                 <button onClick={() => handleDeleteShift(shift.id)} className="text-red-500 hover:text-red-400 p-2">
                   <Trash2 className="w-4 h-4" />

@@ -10,6 +10,8 @@ import { progressRouter } from './routes/progress.js';
 import { billingRouter } from './routes/billing.js';
 import { webhookRouter } from './routes/webhook.js';
 import { shiftsRouter } from './routes/shifts.js';
+import { payrollRouter } from './routes/payroll.js';
+import { accomplishmentsRouter } from './routes/accomplishments.js';
 import { startCronJobs } from './services/cron.js';
 
 dotenv.config();
@@ -37,6 +39,8 @@ app.use('/api/stats', statsRouter);
 app.use('/api/progress', progressRouter);
 app.use('/api/billing', billingRouter);
 app.use('/api/shifts', shiftsRouter);
+app.use('/api/payroll', payrollRouter);
+app.use('/api/accomplishments', accomplishmentsRouter);
 
 // Health check
 app.get('/health', (req, res) => {
